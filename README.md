@@ -39,3 +39,13 @@ Stop the database without deleting its stored data:
 ```bash
 docker compose down
 ```
+
+## Database migrations
+
+Reservoir uses SQLAlchemy for database access and Alembic for schema migrations.
+After changing the database models, generate and apply a migration from the project root:
+
+```bash
+alembic revision --autogenerate -m "Describe the schema change"
+alembic upgrade head
+```
