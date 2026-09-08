@@ -69,3 +69,13 @@ Set `JWT_SECRET` in `.env` to a long random value before using authentication.
 - `POST /auth/register` creates a regular user account.
 - `POST /auth/token` accepts an email in the OAuth2 `username` field and returns a bearer token.
 - `GET /auth/me` returns the user identified by a valid bearer token.
+
+## Admin setup
+
+Register the user normally, then promote the account from the project root:
+
+```bash
+python -m backend.app.commands.promote_admin admin@example.com
+```
+
+Admin promotion is available only through this local command, not through a public API endpoint.

@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import User
+from backend.app.models import User, UserRole
 
 
 load_dotenv()
@@ -99,3 +99,16 @@ def get_current_user(token: BearerToken, database: DatabaseSession) -> User:
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def require_admin(current_user: CurrentUser) -> User:
+    if current_user.role is not UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+
+    return current_user
+
+
+AdminUser = Annotated[User, Depends(require_admin)]

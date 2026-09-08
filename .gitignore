@@ -17,3 +17,5 @@ dist/
 # IDE and operating system
 .vscode/
 .DS_Store
+
+design-decisions.md
