@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-Initial FastAPI backend setup with PostgreSQL, migrations, and the first database models.
+Initial FastAPI backend with PostgreSQL, migrations, database models, and a read-only equipment API.
 
 ## Run the tests
 
@@ -56,3 +56,8 @@ alembic upgrade head
 - An equipment item can have many reservations over time.
 - A reservation belongs to one user and one equipment item.
 - Every reservation must end after it starts.
+
+## Equipment API
+
+- `GET /equipment` lists active equipment in name order.
+- `GET /equipment/{equipment_id}` retrieves one active equipment item.
