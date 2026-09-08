@@ -1,6 +1,15 @@
 from datetime import datetime
+from typing import Self
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
 
 from backend.app.models import UserRole
 
@@ -13,6 +22,56 @@ class EquipmentRead(BaseModel):
     description: str | None
     is_active: bool
     created_at: datetime
+
+
+class EquipmentCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    is_active: bool = True
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, name: str) -> str:
+        normalized_name = name.strip()
+
+        if not normalized_name:
+            raise ValueError("Equipment name cannot be blank")
+
+        return normalized_name
+
+
+class EquipmentUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    is_active: bool | None = None
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, name: str | None) -> str:
+        if name is None:
+            raise ValueError("Equipment name cannot be null")
+
+        normalized_name = name.strip()
+
+        if not normalized_name:
+            raise ValueError("Equipment name cannot be blank")
+
+        return normalized_name
+
+    @field_validator("is_active")
+    @classmethod
+    def require_active_state(cls, is_active: bool | None) -> bool:
+        if is_active is None:
+            raise ValueError("Active state cannot be null")
+
+        return is_active
+
+    @model_validator(mode="after")
+    def require_at_least_one_change(self) -> Self:
+        if not self.model_fields_set:
+            raise ValueError("At least one equipment field is required")
+
+        return self
 
 
 class UserCreate(BaseModel):

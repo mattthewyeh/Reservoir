@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-Initial FastAPI backend with PostgreSQL, equipment browsing, and user authentication.
+Initial FastAPI backend with PostgreSQL, user authentication, and admin-managed equipment.
 
 ## Run the tests
 
@@ -61,6 +61,8 @@ alembic upgrade head
 
 - `GET /equipment` lists active equipment in name order.
 - `GET /equipment/{equipment_id}` retrieves one active equipment item.
+- `POST /equipment` lets an admin create equipment.
+- `PATCH /equipment/{equipment_id}` lets an admin edit, activate, or deactivate equipment.
 
 ## Authentication API
 
