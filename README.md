@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-Initial FastAPI backend setup with an automated health endpoint test and a PostgreSQL development service.
+Initial FastAPI backend setup with PostgreSQL, migrations, and the first database models.
 
 ## Run the tests
 
@@ -49,3 +49,10 @@ After changing the database models, generate and apply a migration from the proj
 alembic revision --autogenerate -m "Describe the schema change"
 alembic upgrade head
 ```
+
+## Data model
+
+- A user can have many reservations and has either a `user` or `admin` role.
+- An equipment item can have many reservations over time.
+- A reservation belongs to one user and one equipment item.
+- Every reservation must end after it starts.
