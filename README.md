@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-Initial FastAPI backend with PostgreSQL, migrations, database models, and a read-only equipment API.
+Initial FastAPI backend with PostgreSQL, equipment browsing, and user authentication.
 
 ## Run the tests
 
@@ -61,3 +61,11 @@ alembic upgrade head
 
 - `GET /equipment` lists active equipment in name order.
 - `GET /equipment/{equipment_id}` retrieves one active equipment item.
+
+## Authentication API
+
+Set `JWT_SECRET` in `.env` to a long random value before using authentication.
+
+- `POST /auth/register` creates a regular user account.
+- `POST /auth/token` accepts an email in the OAuth2 `username` field and returns a bearer token.
+- `GET /auth/me` returns the user identified by a valid bearer token.
