@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Self
 
 from pydantic import (
@@ -11,7 +11,7 @@ from pydantic import (
     model_validator,
 )
 
-from backend.app.models import UserRole
+from backend.app.models import ReservationStatus, UserRole
 
 
 class EquipmentRead(BaseModel):
@@ -103,3 +103,38 @@ class UserRead(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class ReservationCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    equipment_id: int = Field(gt=0)
+    starts_at: datetime
+    ends_at: datetime
+
+    @field_validator("starts_at", "ends_at")
+    @classmethod
+    def require_timezone(cls, timestamp: datetime) -> datetime:
+        if timestamp.tzinfo is None or timestamp.utcoffset() is None:
+            raise ValueError("Reservation times must include a timezone")
+
+        return timestamp.astimezone(timezone.utc)
+
+    @model_validator(mode="after")
+    def require_end_after_start(self) -> Self:
+        if self.ends_at <= self.starts_at:
+            raise ValueError("Reservation end must be after its start")
+
+        return self
+
+
+class ReservationRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    equipment_id: int
+    starts_at: datetime
+    ends_at: datetime
+    status: ReservationStatus
+    created_at: datetime

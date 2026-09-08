@@ -72,6 +72,13 @@ Set `JWT_SECRET` in `.env` to a long random value before using authentication.
 - `POST /auth/token` accepts an email in the OAuth2 `username` field and returns a bearer token.
 - `GET /auth/me` returns the user identified by a valid bearer token.
 
+## Reservation API
+
+- `POST /reservations` lets an authenticated user reserve active equipment.
+- Reservation timestamps must include a timezone and the end must be after the start.
+- Reservation ownership always comes from the bearer token, never from client input.
+- Overlapping reservations are not rejected yet; conflict prevention is the next milestone.
+
 ## Admin setup
 
 Register the user normally, then promote the account from the project root:
