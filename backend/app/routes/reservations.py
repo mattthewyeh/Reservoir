@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -19,6 +20,7 @@ from backend.app.security import CurrentUser
 router = APIRouter(prefix="/reservations", tags=["reservations"])
 DatabaseSession = Annotated[Session, Depends(get_db)]
 RESERVATION_CONFLICT_DETAIL = "Equipment is already reserved for this time"
+RESERVATION_NOT_FOUND_DETAIL = "Reservation not found"
 
 
 def raise_reservation_conflict() -> None:
@@ -26,6 +28,27 @@ def raise_reservation_conflict() -> None:
         status_code=status.HTTP_409_CONFLICT,
         detail=RESERVATION_CONFLICT_DETAIL,
     )
+
+
+def get_owned_reservation(
+    reservation_id: int,
+    current_user: CurrentUser,
+    database: DatabaseSession,
+) -> Reservation:
+    reservation = database.scalar(
+        select(Reservation).where(
+            Reservation.id == reservation_id,
+            Reservation.user_id == current_user.id,
+        )
+    )
+
+    if reservation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=RESERVATION_NOT_FOUND_DETAIL,
+        )
+
+    return reservation
 
 
 @router.post("", response_model=ReservationRead, status_code=status.HTTP_201_CREATED)
@@ -83,5 +106,54 @@ def create_reservation(
 
         raise
 
+    database.refresh(reservation)
+    return reservation
+
+
+@router.get("", response_model=list[ReservationRead])
+def list_reservations(
+    database: DatabaseSession,
+    current_user: CurrentUser,
+):
+    statement = (
+        select(Reservation)
+        .where(Reservation.user_id == current_user.id)
+        .order_by(Reservation.starts_at, Reservation.id)
+    )
+    return list(database.scalars(statement))
+
+
+@router.get("/{reservation_id}", response_model=ReservationRead)
+def get_reservation(
+    reservation_id: int,
+    database: DatabaseSession,
+    current_user: CurrentUser,
+):
+    return get_owned_reservation(reservation_id, current_user, database)
+
+
+@router.post("/{reservation_id}/cancel", response_model=ReservationRead)
+def cancel_reservation(
+    reservation_id: int,
+    database: DatabaseSession,
+    current_user: CurrentUser,
+):
+    reservation = get_owned_reservation(reservation_id, current_user, database)
+
+    if reservation.status == ReservationStatus.CANCELLED:
+        return reservation
+
+    starts_at = reservation.starts_at
+    if starts_at.tzinfo is None:
+        starts_at = starts_at.replace(tzinfo=timezone.utc)
+
+    if starts_at <= datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Reservation can no longer be cancelled",
+        )
+
+    reservation.status = ReservationStatus.CANCELLED
+    database.commit()
     database.refresh(reservation)
     return reservation
