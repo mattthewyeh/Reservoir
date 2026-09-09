@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "react-perf"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "browser": true
+  }
+}

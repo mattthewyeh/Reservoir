@@ -2,7 +2,7 @@
 
 A full-stack platform for reserving shared equipment and preventing conflicting bookings.
 
-## Planned stack
+## Stack
 
 - React and TypeScript
 - FastAPI
@@ -13,7 +13,28 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-FastAPI backend with PostgreSQL, authentication, equipment availability, user/admin reservation workflows, and isolated PostgreSQL integration tests.
+React and TypeScript frontend with registration, login, equipment availability and booking, personal reservation management, and administrator inventory and reservation screens. The FastAPI backend uses PostgreSQL and includes isolated API and PostgreSQL integration tests.
+
+## Run the application
+
+Start PostgreSQL and the FastAPI backend from the project root:
+
+```bash
+cp .env.example .env
+docker compose up -d db
+uvicorn backend.app.main:app --reload
+```
+
+In another terminal, start the frontend:
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. The frontend connects to `http://localhost:8000` by default. Use `VITE_API_URL` to change the API address and `FRONTEND_ORIGINS` to configure the backend's comma-separated browser origins.
 
 ## Run the tests
 
@@ -75,6 +96,10 @@ alembic upgrade head
 - `POST /equipment` lets an admin create equipment.
 - `PATCH /equipment/{equipment_id}` lets an admin edit, activate, or deactivate equipment.
 
+## Admin equipment API
+
+- `GET /admin/equipment` lets an admin list all equipment, including inactive items.
+
 ## Authentication API
 
 Set `JWT_SECRET` in `.env` to a long random value before using authentication.
@@ -99,6 +124,14 @@ Set `JWT_SECRET` in `.env` to a long random value before using authentication.
 - `GET /admin/reservations` lists reservations across all users.
 - `GET /admin/reservations/{reservation_id}` retrieves any reservation.
 - `POST /admin/reservations/{reservation_id}/cancel` lets an admin cancel any confirmed reservation.
+
+## Frontend
+
+- Registration automatically signs the new user in.
+- Saved bearer tokens restore a session after a page reload.
+- Members can check a local-time window, reserve available equipment, review their reservations, and cancel future bookings.
+- Administrators can create, edit, activate, and deactivate equipment and review or cancel reservations across all users.
+- Run `npm run lint`, `npm test`, and `npm run build` from `frontend` to validate the UI.
 
 ## Admin setup
 
