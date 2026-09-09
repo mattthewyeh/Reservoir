@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-FastAPI backend with PostgreSQL, user authentication, admin-managed equipment, and user reservation management.
+FastAPI backend with PostgreSQL, user authentication, equipment management, and user/admin reservation workflows.
 
 ## Run the tests
 
@@ -82,6 +82,12 @@ Set `JWT_SECRET` in `.env` to a long random value before using authentication.
 - Reservation ownership always comes from the bearer token, never from client input.
 - Confirmed reservations for the same equipment cannot overlap.
 - Back-to-back reservations are allowed, and cancelled reservations do not block time.
+
+## Admin reservation API
+
+- `GET /admin/reservations` lists reservations across all users.
+- `GET /admin/reservations/{reservation_id}` retrieves any reservation.
+- `POST /admin/reservations/{reservation_id}/cancel` lets an admin cancel any confirmed reservation.
 
 ## Admin setup
 
