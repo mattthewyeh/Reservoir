@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-reservoir}
       POSTGRES_USER: ${POSTGRES_USER:-reservoir}
@@ -73,7 +73,7 @@ services:
     restart: unless-stopped
 
   db-test:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     profiles: ["test"]
     environment:
       POSTGRES_DB: postgres
