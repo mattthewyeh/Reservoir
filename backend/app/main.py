@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.app.metrics import metrics_app, record_http_metrics
 from backend.app.routes.admin_equipment import router as admin_equipment_router
 from backend.app.routes.admin_reservations import router as admin_reservations_router
 from backend.app.routes.auth import router as auth_router
@@ -27,11 +28,13 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
+app.middleware("http")(record_http_metrics)
 app.include_router(admin_equipment_router)
 app.include_router(admin_reservations_router)
 app.include_router(auth_router)
 app.include_router(equipment_router)
 app.include_router(reservations_router)
+app.mount("/metrics", metrics_app)
 
 
 @app.get("/health")

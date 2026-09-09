@@ -1,0 +1,127 @@
+name: Deploy to AWS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECS_CLUSTER: reservoir-production
+      ECS_SERVICE: reservoir-production-service
+      ECS_TASK_FAMILY: reservoir-production
+      ECR_API_REPOSITORY: reservoir-api
+      ECR_FRONTEND_REPOSITORY: reservoir-frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          role-session-name: reservoir-${{ github.run_id }}
+
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2.1.6
+
+      - name: Build and push immutable images
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          if ! aws ecr describe-images \
+            --repository-name "$ECR_API_REPOSITORY" \
+            --image-ids imageTag="$IMAGE_TAG" > /dev/null 2>&1; then
+            docker build \
+              --platform linux/amd64 \
+              --tag "$REGISTRY/$ECR_API_REPOSITORY:$IMAGE_TAG" \
+              --file backend/Dockerfile \
+              .
+            docker push "$REGISTRY/$ECR_API_REPOSITORY:$IMAGE_TAG"
+          fi
+
+          if ! aws ecr describe-images \
+            --repository-name "$ECR_FRONTEND_REPOSITORY" \
+            --image-ids imageTag="$IMAGE_TAG" > /dev/null 2>&1; then
+            docker build \
+              --platform linux/amd64 \
+              --build-arg VITE_API_URL=/api \
+              --tag "$REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG" \
+              frontend
+            docker push "$REGISTRY/$ECR_FRONTEND_REPOSITORY:$IMAGE_TAG"
+          fi
+
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "$ECS_TASK_FAMILY" \
+            --query taskDefinition \
+            > task-definition.json
+
+      - name: Insert API image
+        id: render-api
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.8.5
+        with:
+          task-definition: task-definition.json
+          container-name: api
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_API_REPOSITORY }}:${{ github.sha }}
+
+      - name: Insert frontend image
+        id: render-frontend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.8.5
+        with:
+          task-definition: ${{ steps.render-api.outputs.task-definition }}
+          container-name: frontend
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_FRONTEND_REPOSITORY }}:${{ github.sha }}
+
+      - name: Read service network configuration
+        id: network
+        run: |
+          subnets=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE" \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.subnets' \
+            --output text | tr '\t' ',')
+          security_groups=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE" \
+            --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups' \
+            --output text | tr '\t' ',')
+          echo "subnets=$subnets" >> "$GITHUB_OUTPUT"
+          echo "security-groups=$security_groups" >> "$GITHUB_OUTPUT"
+
+      - name: Migrate database and deploy service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.3
+        with:
+          task-definition: ${{ steps.render-frontend.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          desired-count: 1
+          run-task: true
+          run-task-container-overrides: '[{"name":"api","command":["alembic","upgrade","head"]}]'
+          run-task-subnets: ${{ steps.network.outputs.subnets }}
+          run-task-security-groups: ${{ steps.network.outputs.security-groups }}
+          run-task-assign-public-IP: ENABLED
+          wait-for-task-stopped: true
+          wait-for-service-stability: true
+          wait-for-minutes: 20
+          wait-max-delay-seconds: 15
+          enable-ecs-managed-tags: true
+          propagate-tags: SERVICE

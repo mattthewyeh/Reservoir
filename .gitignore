@@ -20,3 +20,16 @@ dist/
 .DS_Store
 
 design-decisions.md
+
+# Terraform local state and private inputs
+.terraform/
+backend.tf
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

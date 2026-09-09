@@ -15,7 +15,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-Containerized React and TypeScript frontend with registration, login, equipment availability and booking, personal reservation management, and administrator inventory and reservation screens. Nginx serves the frontend and proxies the FastAPI API, which uses PostgreSQL and includes isolated API and PostgreSQL integration tests.
+Containerized React and TypeScript frontend with registration, login, equipment availability and booking, personal reservation management, and administrator inventory and reservation screens. Nginx serves the frontend and proxies the FastAPI API, which uses PostgreSQL, exports Prometheus metrics internally, and includes isolated API and PostgreSQL integration tests. Terraform and a protected manual workflow define the AWS deployment path without provisioning resources automatically.
 
 ## Run the application
 
@@ -79,10 +79,11 @@ Each PostgreSQL test creates a uniquely named database, applies migrations, and 
 
 ## Continuous integration
 
-GitHub Actions runs on every push and pull request with three quality-gate jobs:
+GitHub Actions runs on every push and pull request with four quality-gate jobs:
 
 - `Backend` runs Ruff linting and formatting checks, isolated tests, migrations, schema-drift detection, and PostgreSQL integration tests.
 - `Frontend` installs the lockfile dependency graph, runs Oxlint and component tests, and builds the production bundle.
+- `Infrastructure` checks Terraform formatting and validates the AWS configuration without provisioning resources.
 - `Containers` validates Compose, builds both images, starts the health-gated stack, and smoke-tests Nginx and the proxied API.
 
 Run the equivalent Python quality checks locally with:
@@ -92,7 +93,25 @@ ruff check backend
 ruff format --check backend
 ```
 
-Dependabot checks GitHub Actions, Python, npm, Dockerfile, and Compose dependencies weekly. After pushing this workflow, configure branch protection on `main` to require the `Backend`, `Frontend`, and `Containers` checks before merging.
+Dependabot checks GitHub Actions, Python, npm, Dockerfile, and Compose dependencies weekly. After pushing this workflow, configure branch protection on `main` to require the `Backend`, `Frontend`, `Infrastructure`, and `Containers` checks before merging.
+
+## Monitoring
+
+FastAPI records request totals and latency using stable method, route-template, and status labels. The metrics endpoint is available only on the internal API service; Nginx deliberately returns `404` for public `/api/metrics` requests.
+
+Start the application with the optional Prometheus profile:
+
+```bash
+docker compose --profile monitoring up --build -d --wait
+```
+
+Open `http://localhost:9090` and query `reservoir_http_requests_total` or `reservoir_http_request_duration_seconds`. Prometheus retains local development data for seven days. AWS infrastructure and logs use CloudWatch after deployment.
+
+## AWS deployment
+
+`infrastructure/terraform` defines HTTPS, ECS Fargate, private RDS PostgreSQL, ECR, Secrets Manager access, CloudWatch logs and dashboards, backups, alarms, and a least-privilege GitHub OIDC deployment role. The stack starts with zero ECS tasks so Terraform can create empty immutable ECR repositories safely before the first image deployment.
+
+Deployment is manual through the protected `production` GitHub environment. It builds commit-SHA-tagged images, runs Alembic as a one-off task, then updates the service with rollback protection. See `infrastructure/README.md` for prerequisites, bootstrap steps, costs, and teardown safeguards. Do not run `terraform apply` until the account, region, domain, state backend, and expected charges have been reviewed.
 
 ## Run PostgreSQL
 

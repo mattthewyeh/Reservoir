@@ -87,7 +87,7 @@ def get_current_user(token: BearerToken, database: DatabaseSession) -> User:
             raise invalid_credentials_exception()
 
         user_id = int(subject.removeprefix("user:"))
-    except InvalidTokenError, ValueError:
+    except (InvalidTokenError, ValueError):
         raise invalid_credentials_exception() from None
 
     user = database.get(User, user_id)

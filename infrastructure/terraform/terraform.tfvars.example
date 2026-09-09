@@ -1,0 +1,14 @@
+aws_region    = "us-west-2"
+domain_name   = "reservoir.example.com"
+hosted_zone_id = "Z0123456789EXAMPLE"
+jwt_secret_arn = "arn:aws:secretsmanager:us-west-2:123456789012:secret:reservoir/production/jwt-example"
+
+# Set this only after the first successful application deployment.
+enable_alarms = false
+
+# Optional alarm email; AWS sends a confirmation message before notifications begin.
+alert_email = null
+
+# If the AWS account already has GitHub's OIDC provider, reuse it instead.
+create_github_oidc_provider = true
+github_oidc_provider_arn    = null

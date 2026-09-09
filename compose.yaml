@@ -49,8 +49,27 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    environment:
+      API_UPSTREAM: api:8000
     ports:
       - "${APP_PORT:-8080}:8080"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.13.3
+    profiles: ["monitoring"]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      api:
+        condition: service_healthy
     restart: unless-stopped
 
   db-test:
@@ -72,3 +91,4 @@ services:
 
 volumes:
   postgres_data:
+  prometheus_data:
