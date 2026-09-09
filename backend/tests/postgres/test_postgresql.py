@@ -63,7 +63,9 @@ def test_migrations_upgrade_from_empty_database_and_are_reversible(
             {"constraint_name": RESERVATION_OVERLAP_CONSTRAINT},
         )
         assert connection.scalar(
-            text("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'btree_gist')")
+            text(
+                "SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'btree_gist')"
+            )
         )
 
     engine.dispose()
@@ -74,7 +76,9 @@ def test_migrations_upgrade_from_empty_database_and_are_reversible(
         assert inspect(connection).get_table_names() == ["alembic_version"]
         assert connection.scalar(text("SELECT count(*) FROM alembic_version")) == 0
         assert connection.scalar(
-            text("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'btree_gist')")
+            text(
+                "SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'btree_gist')"
+            )
         )
 
     engine.dispose()

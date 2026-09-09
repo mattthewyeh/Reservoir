@@ -68,9 +68,7 @@ class Equipment(Base):
         DateTime(timezone=True), server_default=func.now()
     )
 
-    reservations: Mapped[list["Reservation"]] = relationship(
-        back_populates="equipment"
-    )
+    reservations: Mapped[list["Reservation"]] = relationship(back_populates="equipment")
 
 
 class Reservation(Base):

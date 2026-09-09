@@ -225,9 +225,7 @@ def test_create_reservation_rejects_overlapping_confirmed_reservation(
     )
 
     assert response.status_code == 409
-    assert response.json() == {
-        "detail": "Equipment is already reserved for this time"
-    }
+    assert response.json() == {"detail": "Equipment is already reserved for this time"}
     assert database_session.query(Reservation).count() == 1
 
 
@@ -314,7 +312,5 @@ def test_database_overlap_violation_becomes_conflict_response(
     )
 
     assert response.status_code == 409
-    assert response.json() == {
-        "detail": "Equipment is already reserved for this time"
-    }
+    assert response.json() == {"detail": "Equipment is already reserved for this time"}
     assert database_session.query(Reservation).count() == 0

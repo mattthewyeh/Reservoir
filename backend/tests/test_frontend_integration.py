@@ -31,9 +31,7 @@ def test_frontend_origin_is_allowed_by_cors(client: TestClient):
     )
 
     assert response.status_code == 200
-    assert response.headers["access-control-allow-origin"] == (
-        "http://localhost:5173"
-    )
+    assert response.headers["access-control-allow-origin"] == ("http://localhost:5173")
 
 
 def test_admin_equipment_list_rejects_regular_user(

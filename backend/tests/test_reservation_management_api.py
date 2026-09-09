@@ -269,9 +269,7 @@ def test_started_reservation_cannot_be_cancelled(
     )
 
     assert response.status_code == 409
-    assert response.json() == {
-        "detail": "Reservation can no longer be cancelled"
-    }
+    assert response.json() == {"detail": "Reservation can no longer be cancelled"}
     database_session.refresh(reservation)
     assert reservation.status == ReservationStatus.CONFIRMED
 

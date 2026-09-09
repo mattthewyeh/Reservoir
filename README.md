@@ -1,5 +1,7 @@
 # Reservoir
 
+[![CI](https://github.com/mattthewyeh/Reservoir/actions/workflows/ci.yml/badge.svg)](https://github.com/mattthewyeh/Reservoir/actions/workflows/ci.yml)
+
 A full-stack platform for reserving shared equipment and preventing conflicting bookings.
 
 ## Stack
@@ -74,6 +76,23 @@ docker compose --profile test rm -sf db-test
 ```
 
 Each PostgreSQL test creates a uniquely named database, applies migrations, and deletes the database afterward. The test service stores its database cluster in temporary memory instead of the development volume.
+
+## Continuous integration
+
+GitHub Actions runs on every push and pull request with three quality-gate jobs:
+
+- `Backend` runs Ruff linting and formatting checks, isolated tests, migrations, schema-drift detection, and PostgreSQL integration tests.
+- `Frontend` installs the lockfile dependency graph, runs Oxlint and component tests, and builds the production bundle.
+- `Containers` validates Compose, builds both images, starts the health-gated stack, and smoke-tests Nginx and the proxied API.
+
+Run the equivalent Python quality checks locally with:
+
+```bash
+ruff check backend
+ruff format --check backend
+```
+
+Dependabot checks GitHub Actions, Python, npm, Dockerfile, and Compose dependencies weekly. After pushing this workflow, configure branch protection on `main` to require the `Backend`, `Frontend`, and `Containers` checks before merging.
 
 ## Run PostgreSQL
 
