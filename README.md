@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-FastAPI backend with PostgreSQL, user authentication, equipment management, and user/admin reservation workflows.
+FastAPI backend with PostgreSQL, authentication, equipment availability, and user/admin reservation workflows.
 
 ## Run the tests
 
@@ -60,6 +60,7 @@ alembic upgrade head
 ## Equipment API
 
 - `GET /equipment` lists active equipment in name order.
+- `GET /equipment/availability?starts_at=...&ends_at=...` lists active equipment available for a timezone-aware interval.
 - `GET /equipment/{equipment_id}` retrieves one active equipment item.
 - `POST /equipment` lets an admin create equipment.
 - `PATCH /equipment/{equipment_id}` lets an admin edit, activate, or deactivate equipment.

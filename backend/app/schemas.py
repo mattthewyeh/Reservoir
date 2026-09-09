@@ -105,10 +105,9 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
-class ReservationCreate(BaseModel):
+class ReservationTimeRange(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    equipment_id: int = Field(gt=0)
     starts_at: datetime
     ends_at: datetime
 
@@ -126,6 +125,14 @@ class ReservationCreate(BaseModel):
             raise ValueError("Reservation end must be after its start")
 
         return self
+
+
+class EquipmentAvailabilityQuery(ReservationTimeRange):
+    pass
+
+
+class ReservationCreate(ReservationTimeRange):
+    equipment_id: int = Field(gt=0)
 
 
 class ReservationRead(BaseModel):

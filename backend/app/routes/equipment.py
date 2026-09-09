@@ -1,17 +1,23 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import Equipment
-from backend.app.schemas import EquipmentCreate, EquipmentRead, EquipmentUpdate
+from backend.app.models import Equipment, Reservation, ReservationStatus
+from backend.app.schemas import (
+    EquipmentAvailabilityQuery,
+    EquipmentCreate,
+    EquipmentRead,
+    EquipmentUpdate,
+)
 from backend.app.security import AdminUser
 
 
 router = APIRouter(prefix="/equipment", tags=["equipment"])
 DatabaseSession = Annotated[Session, Depends(get_db)]
+AvailabilityQuery = Annotated[EquipmentAvailabilityQuery, Query()]
 
 
 @router.post("", response_model=EquipmentRead, status_code=status.HTTP_201_CREATED)
@@ -35,6 +41,32 @@ def list_equipment(database: DatabaseSession):
         .order_by(Equipment.name, Equipment.id)
     )
 
+    return list(database.scalars(statement))
+
+
+@router.get("/availability", response_model=list[EquipmentRead])
+def list_available_equipment(
+    availability: AvailabilityQuery,
+    database: DatabaseSession,
+):
+    overlapping_reservation = (
+        select(Reservation.id)
+        .where(
+            Reservation.equipment_id == Equipment.id,
+            Reservation.status == ReservationStatus.CONFIRMED,
+            Reservation.starts_at < availability.ends_at,
+            Reservation.ends_at > availability.starts_at,
+        )
+        .exists()
+    )
+    statement = (
+        select(Equipment)
+        .where(
+            Equipment.is_active.is_(True),
+            ~overlapping_reservation,
+        )
+        .order_by(Equipment.name, Equipment.id)
+    )
     return list(database.scalars(statement))
 
 
