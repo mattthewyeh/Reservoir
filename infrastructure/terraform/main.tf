@@ -209,7 +209,7 @@ resource "aws_lb_target_group" "app" {
     healthy_threshold   = 2
     interval            = 30
     matcher             = "200"
-    path                = "/healthz"
+    path                = "/api/ready"
     timeout             = 5
     unhealthy_threshold = 3
   }
@@ -431,7 +431,7 @@ resource "aws_ecs_task_definition" "app" {
         { name = "JWT_SECRET", valueFrom = var.jwt_secret_arn },
       ]
       healthCheck = {
-        command     = ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\""]
+        command     = ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready')\""]
         interval    = 30
         timeout     = 5
         retries     = 3

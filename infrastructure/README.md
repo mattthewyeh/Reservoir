@@ -70,6 +70,8 @@ After the first successful deployment, set `enable_alarms = true` in the private
 
 - Application: the `application_url` Terraform output.
 - API and frontend logs: CloudWatch log groups under `/ecs/reservoir-production/`.
+- Health checks: `/healthz` verifies Nginx, `/api/health` verifies FastAPI liveness, and `/api/ready` verifies FastAPI plus PostgreSQL readiness.
+- Request tracing: copy the API response's `X-Request-ID` value and search for it in the API CloudWatch log group.
 - Infrastructure dashboard: CloudWatch dashboard `reservoir-production`.
 - Application metrics locally: `docker compose --profile monitoring up --build -d --wait`, then open `http://localhost:9090`.
 - Rollback: deploy a previous commit, whose SHA identifies its immutable ECR image pair.

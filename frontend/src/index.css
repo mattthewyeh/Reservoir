@@ -1,4 +1,5 @@
 :root {
+  font-size: 17px;
   font-family:
     Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #183432;
@@ -32,7 +33,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -41,7 +43,8 @@ button {
 }
 
 button:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible {
   outline: 3px solid rgba(23, 99, 94, 0.28);
   outline-offset: 2px;
 }
@@ -60,7 +63,7 @@ h3 {
 }
 
 .button {
-  min-height: 44px;
+  min-height: 46px;
   border: 0;
   border-radius: 12px;
   padding: 0.72rem 1rem;
@@ -109,10 +112,10 @@ h3 {
 }
 
 .button-small {
-  min-height: 36px;
+  min-height: 38px;
   padding: 0.45rem 0.72rem;
   border-radius: 9px;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
 }
 
 .button-full {
@@ -122,7 +125,7 @@ h3 {
 .eyebrow {
   margin-bottom: 0.55rem;
   color: var(--teal);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 850;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -138,8 +141,8 @@ h3 {
 .logo-mark {
   position: relative;
   display: inline-flex;
-  width: 39px;
-  height: 39px;
+  width: 42px;
+  height: 42px;
   overflow: hidden;
   border-radius: 12px;
   background: var(--lime);
@@ -166,7 +169,7 @@ h3 {
 }
 
 .logo-word {
-  font-size: 1.18rem;
+  font-size: 1.22rem;
   font-weight: 850;
   letter-spacing: -0.04em;
 }
@@ -249,12 +252,12 @@ h3 {
 
 .hero-proof strong {
   color: var(--lime);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
 }
 
 .hero-proof span {
   color: rgba(255, 255, 255, 0.58);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
 }
 
 .hero-orbit {
@@ -361,18 +364,23 @@ label {
   display: grid;
   gap: 0.45rem;
   color: #3c514f;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 760;
 }
 
-input {
+input,
+select {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   border: 1px solid var(--line);
   border-radius: 11px;
   padding: 0.75rem 0.85rem;
   color: var(--ink);
   background: #fff;
+}
+
+select {
+  cursor: pointer;
 }
 
 input::placeholder {
@@ -383,7 +391,7 @@ input::placeholder {
 .success-alert {
   border-radius: 10px;
   padding: 0.8rem 0.9rem;
-  font-size: 0.84rem;
+  font-size: 0.88rem;
 }
 
 .form-alert {
@@ -401,7 +409,7 @@ input::placeholder {
 .auth-footnote {
   margin: 1.4rem 0 0;
   color: #899591;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   text-align: center;
 }
 
@@ -438,7 +446,7 @@ input::placeholder {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  min-height: 76px;
+  min-height: 80px;
   border-bottom: 1px solid rgba(24, 52, 50, 0.1);
   padding: 0 4vw;
   background: rgba(255, 253, 247, 0.9);
@@ -465,7 +473,7 @@ input::placeholder {
   border-radius: 9px;
   padding: 0.58rem 0.8rem;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 750;
 }
 
@@ -484,13 +492,13 @@ input::placeholder {
 
 .avatar {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   border-radius: 50%;
   color: var(--deep);
   background: var(--lime);
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   font-weight: 900;
 }
 
@@ -499,13 +507,13 @@ input::placeholder {
   flex-direction: column;
 }
 
-.user-copy strong { font-size: 0.78rem; }
-.user-copy small { color: var(--muted); font-size: 0.68rem; }
+.user-copy strong { font-size: 0.82rem; }
+.user-copy small { color: var(--muted); font-size: 0.72rem; }
 
 .text-button {
   margin-left: 0.4rem;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.79rem;
   font-weight: 700;
 }
 
@@ -552,7 +560,7 @@ input::placeholder {
   padding: 0.55rem 0.8rem;
   color: var(--teal);
   background: rgba(255, 255, 255, 0.52);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 800;
 }
 
@@ -562,7 +570,7 @@ input::placeholder {
   align-items: center;
   gap: 2rem;
   border-radius: 24px;
-  padding: 1.6rem;
+  padding: 1.7rem;
   color: #fff;
   background: var(--deep);
   box-shadow: var(--shadow);
@@ -576,38 +584,66 @@ input::placeholder {
 
 .availability-copy h2 {
   margin-bottom: 0.25rem;
-  font-size: 1.1rem;
+  font-size: 1.16rem;
 }
 
 .availability-copy p {
   margin: 0;
   color: rgba(255, 255, 255, 0.58);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 .step-number {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   flex: 0 0 auto;
   place-items: center;
   border-radius: 14px;
   color: var(--deep);
   background: var(--lime);
-  font-size: 0.75rem;
+  font-size: 0.79rem;
   font-weight: 900;
 }
 
 .availability-form {
-  grid-template-columns: 1fr auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
   align-items: end;
 }
 
-.availability-form label {
+.datetime-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.datetime-label,
+.datetime-field label {
   color: rgba(255, 255, 255, 0.65);
 }
 
-.availability-form input {
+.datetime-label {
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.datetime-selects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.datetime-selects label {
+  min-width: 0;
+  gap: 0.3rem;
+}
+
+.datetime-selects label > span {
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.datetime-selects select {
   border-color: rgba(255, 255, 255, 0.18);
   color-scheme: dark;
   color: #fff;
@@ -639,7 +675,7 @@ input::placeholder {
   max-width: 480px;
   margin: 0;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   text-align: right;
 }
 
@@ -708,7 +744,7 @@ input::placeholder {
   align-items: center;
   gap: 0.4rem;
   color: var(--teal);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -728,7 +764,7 @@ input::placeholder {
 .equipment-body p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   line-height: 1.5;
 }
 
@@ -810,17 +846,17 @@ input::placeholder {
 
 .booking-summary span {
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
-.booking-summary strong { font-size: 0.88rem; }
+.booking-summary strong { font-size: 0.92rem; }
 
 .dialog-note {
   margin: 1.2rem 0;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   line-height: 1.55;
 }
 
@@ -869,7 +905,7 @@ input::placeholder {
 }
 
 .reservation-title-line h3 { margin: 0; }
-.reservation-main p { margin: 0.35rem 0; color: var(--muted); font-size: 0.84rem; }
+.reservation-main p { margin: 0.35rem 0; color: var(--muted); font-size: 0.88rem; }
 .reservation-main small { color: #93a09b; }
 
 .status-pill {
@@ -877,7 +913,7 @@ input::placeholder {
   width: fit-content;
   border-radius: 999px;
   padding: 0.3rem 0.55rem;
-  font-size: 0.63rem;
+  font-size: 0.68rem;
   font-weight: 850;
   text-transform: uppercase;
 }
@@ -930,9 +966,9 @@ input::placeholder {
 }
 
 .admin-equipment-row:last-child { border-bottom: 0; }
-.admin-equipment-row label span { font-size: 0.68rem; }
+.admin-equipment-row label span { font-size: 0.72rem; }
 .admin-equipment-row input { min-height: 38px; padding: 0.55rem 0.65rem; }
-.admin-equipment-id { align-self: center; color: #8a9893; font-size: 0.72rem; }
+.admin-equipment-id { align-self: center; color: #8a9893; font-size: 0.76rem; }
 .admin-row-actions { display: flex; gap: 0.4rem; }
 .inline-error { grid-column: 2 / -1; color: var(--danger); }
 
@@ -955,7 +991,7 @@ input::placeholder {
   padding: 0.75rem 1rem;
   color: #7b8a85;
   background: #eef0ea;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -964,7 +1000,7 @@ input::placeholder {
 .admin-table-row {
   padding: 1rem;
   border-top: 1px solid #e4e7df;
-  font-size: 0.8rem;
+  font-size: 0.84rem;
 }
 
 .admin-table-row > span { display: grid; gap: 0.25rem; }
@@ -991,7 +1027,7 @@ input::placeholder {
     background: rgba(244, 242, 233, 0.94);
     backdrop-filter: blur(14px);
   }
-  .mobile-nav button { white-space: nowrap; border-radius: 999px; padding: 0.5rem 0.8rem; font-size: 0.75rem; font-weight: 750; }
+  .mobile-nav button { white-space: nowrap; border-radius: 999px; padding: 0.5rem 0.8rem; font-size: 0.8rem; font-weight: 750; }
   .mobile-nav button.active { color: #fff; background: var(--teal); }
   .admin-equipment-row { grid-template-columns: 42px 1fr 1fr; align-items: center; }
   .admin-row-actions { grid-column: 2 / -1; }
@@ -1006,8 +1042,8 @@ input::placeholder {
   .hero-copy h1 { font-size: clamp(3rem, 15vw, 5rem); }
   .hero-proof { display: none; }
   .auth-panel-wrap { min-height: auto; padding: 3rem 1.4rem 5rem; }
-  .app-header { min-height: 68px; padding: 0 1rem; }
-  .mobile-nav { top: 68px; padding-inline: 1rem; }
+  .app-header { min-height: 72px; padding: 0 1rem; }
+  .mobile-nav { top: 72px; padding-inline: 1rem; }
   .user-copy { display: none; }
   .text-button { margin-left: 0; }
   .dashboard-main { width: min(100% - 2rem, 620px); padding-top: 2.6rem; }

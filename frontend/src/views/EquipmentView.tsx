@@ -5,11 +5,13 @@ import {
   getAvailableEquipment,
   getEquipment,
 } from '../api'
+import {DateTimeSelect} from '../components/DateTimeSelect'
 import type {Equipment} from '../types'
 import {
   defaultReservationRange,
   formatDateTime,
   messageFrom,
+  toLocalInputValue,
   toUtcIso,
 } from '../utils'
 
@@ -62,6 +64,15 @@ export function EquipmentView({token}: EquipmentViewProps) {
     await searchAvailability()
   }
 
+  function handleStartsAtChange(value: string) {
+    setStartsAt(value)
+
+    if (new Date(value) >= new Date(endsAt)) {
+      const adjustedEnd = new Date(new Date(value).getTime() + 2 * 60 * 60 * 1000)
+      setEndsAt(toLocalInputValue(adjustedEnd))
+    }
+  }
+
   async function handleReservation() {
     if (!selectedEquipment) {
       return
@@ -111,26 +122,18 @@ export function EquipmentView({token}: EquipmentViewProps) {
           </div>
         </div>
         <form className="availability-form" onSubmit={handleSearch}>
-          <label>
-            Start
-            <input
-              type="datetime-local"
-              value={startsAt}
-              onChange={(event) => setStartsAt(event.target.value)}
-              required
-            />
-          </label>
+          <DateTimeSelect
+            label="Start"
+            value={startsAt}
+            onChange={handleStartsAtChange}
+          />
           <span className="range-arrow" aria-hidden="true">→</span>
-          <label>
-            End
-            <input
-              type="datetime-local"
-              value={endsAt}
-              min={startsAt}
-              onChange={(event) => setEndsAt(event.target.value)}
-              required
-            />
-          </label>
+          <DateTimeSelect
+            label="End"
+            value={endsAt}
+            min={startsAt}
+            onChange={setEndsAt}
+          />
           <button className="button button-primary" disabled={isLoading}>
             {isLoading ? 'Checking…' : 'Check availability'}
           </button>

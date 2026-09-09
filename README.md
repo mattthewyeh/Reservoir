@@ -99,6 +99,10 @@ Dependabot checks GitHub Actions, Python, npm, Dockerfile, and Compose dependenc
 
 FastAPI records request totals and latency using stable method, route-template, and status labels. The metrics endpoint is available only on the internal API service; Nginx deliberately returns `404` for public `/api/metrics` requests.
 
+`GET /health` is a process liveness check, while `GET /ready` verifies that FastAPI can query PostgreSQL. Containers and the AWS load balancer use the database-aware readiness endpoint before routing application traffic.
+
+API responses include an `X-Request-ID` header. A valid incoming request ID is preserved; otherwise the API generates one. Non-probe requests produce one-line JSON access logs with the request ID, route template, status, and duration so a browser error can be correlated with container logs without recording query strings or request bodies.
+
 Start the application with the optional Prometheus profile:
 
 ```bash
@@ -187,7 +191,7 @@ Set `JWT_SECRET` in `.env` to a long random value before using authentication.
 
 - Registration automatically signs the new user in.
 - Saved bearer tokens restore a session after a page reload.
-- Members can check a local-time window, reserve available equipment, review their reservations, and cancel future bookings.
+- Members choose local dates and half-hour times from balanced scrollable lists, reserve available equipment, review their reservations, and cancel future bookings.
 - Administrators can create, edit, activate, and deactivate equipment and review or cancel reservations across all users.
 - Run `npm run lint`, `npm test`, and `npm run build` from `frontend` to validate the UI.
 
