@@ -13,19 +13,39 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-React and TypeScript frontend with registration, login, equipment availability and booking, personal reservation management, and administrator inventory and reservation screens. The FastAPI backend uses PostgreSQL and includes isolated API and PostgreSQL integration tests.
+Containerized React and TypeScript frontend with registration, login, equipment availability and booking, personal reservation management, and administrator inventory and reservation screens. Nginx serves the frontend and proxies the FastAPI API, which uses PostgreSQL and includes isolated API and PostgreSQL integration tests.
 
 ## Run the application
 
-Start PostgreSQL and the FastAPI backend from the project root:
+Create the environment file, replace the example `JWT_SECRET`, and start the complete application from the project root:
 
 ```bash
 cp .env.example .env
+docker compose up --build -d --wait
+```
+
+Open `http://localhost:8080`. API documentation is available at `http://localhost:8080/api/docs`. The API container applies pending Alembic migrations before it starts, and Nginx forwards browser requests from `/api` to the internal API service.
+
+View service status and logs or stop the application with:
+
+```bash
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+`docker compose down` keeps the PostgreSQL volume. Add `--volumes` only when you intentionally want to delete local database data.
+
+## Local development
+
+To run the backend and frontend directly for hot reloading, first start only PostgreSQL:
+
+```bash
 docker compose up -d db
 uvicorn backend.app.main:app --reload
 ```
 
-In another terminal, start the frontend:
+In another terminal:
 
 ```bash
 cd frontend
@@ -34,7 +54,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. The frontend connects to `http://localhost:8000` by default. Use `VITE_API_URL` to change the API address and `FRONTEND_ORIGINS` to configure the backend's comma-separated browser origins.
+Open `http://localhost:5173`. The development frontend connects to `http://localhost:8000` by default. Use `VITE_API_URL` to change the API address, `FRONTEND_ORIGINS` to configure the backend's comma-separated browser origins, and `APP_PORT` to change the containerized application's host port.
 
 ## Run the tests
 
@@ -142,3 +162,9 @@ python -m backend.app.commands.promote_admin admin@example.com
 ```
 
 Admin promotion is available only through this local command, not through a public API endpoint.
+
+When the complete application is running in Docker, use:
+
+```bash
+docker compose exec api python -m backend.app.commands.promote_admin admin@example.com
+```

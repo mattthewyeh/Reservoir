@@ -15,6 +15,44 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-reservoir}:${POSTGRES_PASSWORD:-reservoir_dev_password}@db:5432/${POSTGRES_DB:-reservoir}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:5173}
+      ROOT_PATH: /api
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: frontend
+      args:
+        VITE_API_URL: /api
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    restart: unless-stopped
+
   db-test:
     image: postgres:17-alpine
     profiles: ["test"]

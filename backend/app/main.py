@@ -10,7 +10,10 @@ from backend.app.routes.equipment import router as equipment_router
 from backend.app.routes.reservations import router as reservations_router
 
 
-app = FastAPI(title="Reservoir API")
+app = FastAPI(
+    title="Reservoir API",
+    root_path=os.getenv("ROOT_PATH", ""),
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
