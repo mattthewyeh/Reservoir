@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-FastAPI backend with PostgreSQL, authentication, equipment availability, and user/admin reservation workflows.
+FastAPI backend with PostgreSQL, authentication, equipment availability, user/admin reservation workflows, and isolated PostgreSQL integration tests.
 
 ## Run the tests
 
@@ -23,6 +23,16 @@ Install the development dependencies and run pytest from the project root:
 pip install -r backend/requirements-dev.txt
 pytest
 ```
+
+The default suite uses in-memory SQLite and excludes tests marked `postgres`. Run the isolated PostgreSQL suite with:
+
+```bash
+docker compose --profile test up -d --wait db-test
+pytest -m postgres
+docker compose --profile test rm -sf db-test
+```
+
+Each PostgreSQL test creates a uniquely named database, applies migrations, and deletes the database afterward. The test service stores its database cluster in temporary memory instead of the development volume.
 
 ## Run PostgreSQL
 
