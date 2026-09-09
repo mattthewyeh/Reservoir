@@ -39,7 +39,7 @@ jobs:
 
       - name: Log in to Amazon ECR
         id: ecr
-        uses: aws-actions/amazon-ecr-login@v2.1.6
+        uses: aws-actions/amazon-ecr-login@v2.1.7
 
       - name: Build and push immutable images
         env:
