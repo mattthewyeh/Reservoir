@@ -13,7 +13,7 @@ A full-stack platform for reserving shared equipment and preventing conflicting 
 
 ## Current status
 
-Initial FastAPI backend with PostgreSQL, user authentication, and admin-managed equipment.
+FastAPI backend with PostgreSQL, user authentication, admin-managed equipment, and conflict-safe reservation creation.
 
 ## Run the tests
 
@@ -77,7 +77,8 @@ Set `JWT_SECRET` in `.env` to a long random value before using authentication.
 - `POST /reservations` lets an authenticated user reserve active equipment.
 - Reservation timestamps must include a timezone and the end must be after the start.
 - Reservation ownership always comes from the bearer token, never from client input.
-- Overlapping reservations are not rejected yet; conflict prevention is the next milestone.
+- Confirmed reservations for the same equipment cannot overlap.
+- Back-to-back reservations are allowed, and cancelled reservations do not block time.
 
 ## Admin setup
 

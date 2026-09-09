@@ -11,10 +11,15 @@ from sqlalchemy import (
     String,
     Text,
     func,
+    text,
 )
+from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database import Base
+
+
+RESERVATION_OVERLAP_CONSTRAINT = "no_overlapping_confirmed_reservations"
 
 
 class UserRole(str, PythonEnum):
@@ -78,6 +83,13 @@ class Reservation(Base):
             "starts_at",
             "ends_at",
         ),
+        ExcludeConstraint(
+            ("equipment_id", "="),
+            (text("tstzrange(starts_at, ends_at, '[)')"), "&&"),
+            where=text("status = 'confirmed'::reservation_status"),
+            using="gist",
+            name=RESERVATION_OVERLAP_CONSTRAINT,
+        ).ddl_if(dialect="postgresql"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
