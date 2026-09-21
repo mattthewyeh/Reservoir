@@ -920,6 +920,26 @@ input::placeholder {
   text-align: right;
 }
 
+.results-tools {
+  display: grid;
+  width: min(100%, 320px);
+  justify-items: end;
+  gap: 0.65rem;
+}
+
+.equipment-search {
+  width: 100%;
+}
+
+.equipment-search span {
+  font-size: 0.72rem;
+}
+
+.equipment-search input {
+  min-height: 44px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
 .equipment-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1294,6 +1314,7 @@ input::placeholder {
   .range-arrow { display: none; }
   .equipment-grid { grid-template-columns: 1fr; }
   .section-heading-row { align-items: flex-start; flex-direction: column; gap: 0.8rem; }
+  .results-tools { justify-items: start; }
   .range-summary { text-align: left; }
   .booking-summary { grid-template-columns: 1fr; }
   .reservation-row { grid-template-columns: 54px 1fr; }

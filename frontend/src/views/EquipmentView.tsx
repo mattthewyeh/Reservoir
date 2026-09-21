@@ -26,11 +26,17 @@ export function EquipmentView({token}: EquipmentViewProps) {
   const [endsAt, setEndsAt] = useState(defaultRange.endsAt)
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null)
+  const [equipmentQuery, setEquipmentQuery] = useState('')
   const [hasSearched, setHasSearched] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isBooking, setIsBooking] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+
+  const normalizedQuery = equipmentQuery.trim().toLowerCase()
+  const filteredEquipment = equipment.filter((item) =>
+    `${item.name} ${item.description ?? ''}`.toLowerCase().includes(normalizedQuery),
+  )
 
   useEffect(() => {
     getEquipment()
@@ -150,14 +156,27 @@ export function EquipmentView({token}: EquipmentViewProps) {
             <h2>
               {isLoading
                 ? 'Loading equipment…'
-                : `${equipment.length} ${equipment.length === 1 ? 'item' : 'items'}`}
+                : normalizedQuery
+                  ? `${filteredEquipment.length} of ${equipment.length} items`
+                  : `${equipment.length} ${equipment.length === 1 ? 'item' : 'items'}`}
             </h2>
           </div>
-          {hasSearched && (
-            <p className="range-summary">
-              {formatDateTime(toUtcIso(startsAt))} — {formatDateTime(toUtcIso(endsAt))}
-            </p>
-          )}
+          <div className="results-tools">
+            {hasSearched && (
+              <p className="range-summary">
+                {formatDateTime(toUtcIso(startsAt))} — {formatDateTime(toUtcIso(endsAt))}
+              </p>
+            )}
+            <label className="equipment-search">
+              <span>Search equipment</span>
+              <input
+                type="search"
+                value={equipmentQuery}
+                placeholder="Name or description"
+                onChange={(event) => setEquipmentQuery(event.target.value)}
+              />
+            </label>
+          </div>
         </div>
 
         {!isLoading && equipment.length === 0 && (
@@ -168,8 +187,16 @@ export function EquipmentView({token}: EquipmentViewProps) {
           </div>
         )}
 
+        {!isLoading && equipment.length > 0 && filteredEquipment.length === 0 && (
+          <div className="empty-state">
+            <span>0</span>
+            <h3>No equipment matches your search.</h3>
+            <p>Try a different name or description.</p>
+          </div>
+        )}
+
         <div className="equipment-grid">
-          {equipment.map((item, index) => (
+          {filteredEquipment.map((item, index) => (
             <article className="equipment-card" key={item.id}>
               <div className={`equipment-visual tone-${index % 4}`}>
                 <span>{item.name.slice(0, 3).toUpperCase()}</span>
