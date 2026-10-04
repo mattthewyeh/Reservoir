@@ -97,7 +97,7 @@ Dependabot checks GitHub Actions, Python, npm, Dockerfile, and Compose dependenc
 
 ## Monitoring
 
-FastAPI records request totals and latency using stable method, route-template, and status labels. The metrics endpoint is available only on the internal API service; Nginx deliberately returns `404` for public `/api/metrics` requests.
+FastAPI records request totals and latency using stable method, route-template, and status labels. The metrics endpoint is available only on the internal API service; Nginx deliberately returns `404` for public `/api/metrics`, `/api/metrics/`, and all descendant paths. Prometheus scrapes `/metrics/` directly on the internal API service.
 
 `GET /health` is a process liveness check, while `GET /ready` verifies that FastAPI can query PostgreSQL. Containers and the AWS load balancer use the database-aware readiness endpoint before routing application traffic.
 

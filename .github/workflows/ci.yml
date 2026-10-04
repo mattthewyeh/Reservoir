@@ -152,9 +152,37 @@ jobs:
 
       - name: Smoke test application
         run: |
-          curl --fail --silent --show-error http://127.0.0.1:8080/healthz
-          test "$(curl --fail --silent --show-error http://127.0.0.1:8080/api/health)" = '{"status":"healthy"}'
-          curl --fail --silent --show-error http://127.0.0.1:8080/api/equipment
+          base_url="http://127.0.0.1:${APP_PORT:-8080}"
+          curl --fail --silent --show-error "$base_url/healthz"
+          test "$(curl --fail --silent --show-error "$base_url/api/health")" = '{"status":"healthy"}'
+          test "$(curl --fail --silent --show-error "$base_url/api/ready")" = '{"status":"ready"}'
+          curl --fail --silent --show-error "$base_url/api/equipment"
+
+          for path in \
+            /api/metrics \
+            /api/metrics/ \
+            /api/metrics/suffix \
+            /api/metrics/nested/suffix \
+            '/api/metrics/suffix?probe=1' \
+            /api/%6detrics/suffix \
+            /api//metrics/suffix; do
+            status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$base_url$path")
+            if [ "$status" != 404 ]; then
+              echo "Expected 404 for $path, got $status" >&2
+              exit 1
+            fi
+          done
+
+          docker compose exec -T api python - <<'PY'
+          import urllib.request
+
+          with urllib.request.urlopen("http://127.0.0.1:8000/metrics/") as response:
+              assert response.status == 200
+              assert "text/plain" in response.headers["Content-Type"]
+              metrics = response.read().decode()
+          assert "reservoir_http_requests_total" in metrics
+          assert 'method="GET",route="/health",status="200"' in metrics
+          PY
 
       - name: Show container logs after failure
         if: failure()
