@@ -108,7 +108,7 @@ jobs:
           echo "security-groups=$security_groups" >> "$GITHUB_OUTPUT"
 
       - name: Migrate database and deploy service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.3
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.6.4
         with:
           task-definition: ${{ steps.render-frontend.outputs.task-definition }}
           cluster: ${{ env.ECS_CLUSTER }}
